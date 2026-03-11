@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore data files but keep the directory
+data/*
+!data/.gitignore
+!data/.gitkeep

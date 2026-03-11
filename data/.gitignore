@@ -1,0 +1,11 @@
+# Ignore everything in this directory
+*
+
+# Except this file
+!.gitignore
+
+# And except .gitkeep if present
+!.gitkeep
+
+# Ignore pycache explicitly in case
+__pycache__/
