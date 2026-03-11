@@ -2,6 +2,8 @@
 
 A complete solution for extracting and serving data from [repository.upi.edu](https://repository.upi.edu) — the academic paper archive of Universitas Pendidikan Indonesia (~90,000 papers).
 
+![sqlite](https://github.com/user-attachments/assets/24418efb-9bf7-4e88-bc73-49b63d575d87)
+
 https://github.com/user-attachments/assets/1a33391d-3cd7-4885-8c4c-a0f38600f114
 
 This project contains two main components:
