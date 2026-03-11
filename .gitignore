@@ -1,6 +1,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+test_authors.py
 
 # Ignore data files but keep the directory
 data/*

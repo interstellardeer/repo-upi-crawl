@@ -1,6 +1,11 @@
 # UPI Repository Scraper API
 
-A web scraper and REST API for [repository.upi.edu](https://repository.upi.edu) — the academic paper archive of Universitas Pendidikan Indonesia (~90,000 papers).
+A complete solution for extracting and serving data from [repository.upi.edu](https://repository.upi.edu) — the academic paper archive of Universitas Pendidikan Indonesia (~90,000 papers).
+
+This project contains two main components:
+
+1. **A Crawler**: Extracts paper metadata and URLs from the repository and stores them efficiently in a local SQLite database.
+2. **An API Server**: A FastAPI-based REST API that serves the scraped data from the SQLite database, featuring full-text search and filtering capabilities.
 
 ## Quick Start
 
@@ -44,7 +49,7 @@ python -m app.cli serve
 python -m app.cli serve --reload
 ```
 
-API docs available at: **http://localhost:8000/docs**
+API docs available at: **<http://localhost:8000/docs>**
 
 ---
 
@@ -117,23 +122,50 @@ curl "http://localhost:8000/stats"
 
 ## CLI Reference
 
-```
+The API and Scraper are primarily controlled through the `app.cli` module.
+
+### Crawl Command
+
+The `crawl` command is the main engine for scraping data from the repository. You can target specific subsets of the repository or perform full crawls.
+
+```bash
 python -m app.cli crawl [OPTIONS]
-  --year INTEGER       Crawl a specific year
-  --division TEXT      Crawl a division (use the code, e.g. ILKOM)
-  --author TEXT        Crawl by author slug or name
-  --all                Full crawl (all years)
-  --incremental        Only crawl what has changed
-  --bootstrap          Only update reference tables (no papers)
-
-python -m app.cli serve [OPTIONS]
-  --host TEXT          Bind host [default: 0.0.0.0]
-  --port INTEGER       Bind port [default: 8000]
-  --reload             Enable auto-reload
-
-python -m app.cli reset [--force]
-  Drop and recreate the database
 ```
+
+**Options for `crawl`:**
+
+- `--year INTEGER`, `-y`: Crawl papers published in a specific year. Useful for updating recent additions.
+- `--division TEXT`, `-d`: Crawl papers from a specific division code (e.g. `ILKOM` for Computer Science).
+- `--author TEXT`, `-a`: Crawl papers by a specific author (using their exact name or URL slug).
+- `--all`: Perform a full historical crawl of the entire repository. Note: This can take several hours depending on connection speed.
+- `--incremental`: Default behavior if no option is specified. Crawl incrementally, finding and adding only newly added or modified papers since the last crawl.
+- `--bootstrap`: Sync reference tables only (divisions, subjects, authors) without processing any individual papers. Faster for initial structure setup.
+
+### Serve Command
+
+The `serve` command starts the FastAPI server to expose your local SQLite database via REST API.
+
+```bash
+python -m app.cli serve [OPTIONS]
+```
+
+**Options for `serve`:**
+
+- `--host TEXT`: Network interface to bind to [default: `0.0.0.0`]
+- `--port INTEGER`: Port to bind to [default: `8000`]
+- `--reload`: Enable hot auto-reload for development. The server automatically restarts when code changes are detected.
+
+### Reset Command
+
+The `reset` command manages the local database lifecycle.
+
+```bash
+python -m app.cli reset [OPTIONS]
+```
+
+**Options for `reset`:**
+
+- `--force`: Skip the confirmation prompt when dropping the database. **Warning:** This will permanently delete your configured local `db.sqlite`!
 
 ---
 
@@ -153,7 +185,8 @@ Full-text search is powered by SQLite FTS5 on `title`, `abstract_id`, and `abstr
 ## Politeness Policy
 
 The crawler is designed to be respectful of the server:
-- Max **5 concurrent requests** 
+
+- Max **5 concurrent requests**
 - **0.5 second delay** between requests
 - Proper `User-Agent` header
 - Exponential backoff on errors (1s, 2s, 4s)
@@ -173,3 +206,11 @@ Some useful division codes for quick testing:
 | `FPMIPA` | Fakultas Pendidikan Matematika dan IPA |
 | `geo` | Pendidikan Geografi S1 |
 | `SPS` | Sekolah Pasca Sarjana |
+
+---
+
+## A Note for UPI Students :)
+
+Hopefully, this repository can help you create other cool applications or get integrated into your own projects! Whether you're building an **LLM Chatbot**, a **RAG (Retrieval-Augmented Generation)** system, or any other data-driven application using the university's research data, this API gives you a structured way to get the data you need.
+
+*(Get creative and build something awesome before the university decides to block this crawler! Lol)* 🚀
