@@ -2,6 +2,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 test_authors.py
+.env
 
 # Ignore data files but keep the directory
 data/*
