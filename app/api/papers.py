@@ -86,8 +86,13 @@ def search_papers(
         WHERE paper_fts MATCH :q
     """), {"q": q}).one()
 
-    papers = [dict(r) for r in rows]
-    return {"total": count_row[0], "page": page, "limit": limit, "results": papers}
+    papers = [Paper.model_validate(dict(r)) for r in rows]
+    return {
+        "total": count_row[0],
+        "page": page,
+        "limit": limit,
+        "results": [_paper_to_dict(p) for p in papers]
+    }
 
 
 @router.get("/{paper_id}")

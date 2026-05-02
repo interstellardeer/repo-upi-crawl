@@ -109,11 +109,28 @@ def parse_paper(soup: BeautifulSoup, eprint_id: int, base_url: str) -> PaperDeta
 
     # --- PDF URLs ---
     pdf_urls: list[str] = []
-    for a in soup.find_all("a", href=re.compile(rf"/{eprint_id}/\d+/.+\.pdf")):
-        raw_href = a["href"]
-        normalized = _normalize_url(raw_href if raw_href.startswith("http") else base_url + raw_href)
-        if normalized not in pdf_urls:
+    seen_urls: set[str] = set()
+
+    def add_url(url: str):
+        normalized = _normalize_url(url if url.startswith("http") else base_url + url)
+        if normalized not in seen_urls:
+            seen_urls.add(normalized)
             pdf_urls.append(normalized)
+
+    # 1. Check meta tags (most reliable for EPrints)
+    for meta in soup.find_all("meta", attrs={"name": "eprints.document_url"}):
+        content = meta.get("content")
+        if content:
+            add_url(content)
+
+    # 2. Check for "Full Text" reader link
+    reader_link = soup.find("a", href=re.compile(r"reader-repository\.upi\.edu/index\.php/display/file/"))
+    if reader_link:
+        add_url(reader_link["href"])
+
+    # 3. Fallback/Supplement: Existing regex for links in body
+    for a in soup.find_all("a", href=re.compile(rf"/{eprint_id}/\d+/.+\.pdf")):
+        add_url(a["href"])
 
     eprint_url = f"{base_url}/{eprint_id}/"
 
