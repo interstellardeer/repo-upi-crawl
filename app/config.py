@@ -6,8 +6,8 @@ class Settings(BaseSettings):
 
     BASE_URL: str = "https://repository.upi.edu"
     DB_PATH: str = "data/upi_repository.db"
-    CONCURRENCY: int = 5
-    REQUEST_DELAY: float = 0.5
+    CONCURRENCY: int = 15
+    REQUEST_DELAY: float = 0.1
     CRAWL_API_KEY: str = "changeme"
 
 
